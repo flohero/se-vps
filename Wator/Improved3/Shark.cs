@@ -53,8 +53,8 @@ namespace VPS.Wator.Improved3
             if (free.X != -1)
             {
                 // empty neighboring cell found -> create new shark there and share energy between parent and child shark
-                Shark shark = new Shark(World, free, Energy / 2);
-                Energy = Energy / 2;
+                Energy /= 2;
+                new Shark(World, free, Energy);
             }
         }
     }

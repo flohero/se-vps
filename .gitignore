@@ -1,4 +1,5 @@
 *.diagsession
+*.pdf
 # Created by https://www.toptal.com/developers/gitignore/api/windows,csharp,dotnetcore,visualstudio,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,csharp,dotnetcore,visualstudio,visualstudiocode
 

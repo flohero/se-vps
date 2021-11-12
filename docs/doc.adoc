@@ -133,7 +133,6 @@ image::./img/improvement1.png[]
 Convert all 2d Arrays to a one dimensional array.
 So instead of using `Grid[i, j]` it's `Grid[i + j * Width]`
 
-.Improvement 2 with removed unnecessary code
 [source,csharp]
 ----
 private int[] randomMatrix;
@@ -239,5 +238,35 @@ image::./img/improvement2.png[]
 
 
 === 3. Improvement
+The `RandomizeMatrix` Algorithm is replaced by the standard Knuth Shuffle and the `Shark.Spawn`-Method has been optimized.
 
+[source,csharp]
+----
+private void RandomizeMatrix(int[] matrix)
+{
+    int n = matrix.Length;
+    for (int i = 0; i < (n - 2); i++)
+    {
+        int j = random.Next(i, n);
+        var tmp = matrix[i];
+        matrix[i] = matrix[j];
+        matrix[j] = tmp;
+
+    }
+}
+// Shark.cs
+protected override void Spawn()
+{
+    Point free = World.SelectNeighbor(null, Position);  // find a random empty neighboring cell
+    if (free.X != -1)
+    {
+        // empty neighboring cell found -> create new shark there and share energy between parent and child shark
+        Energy /= 2;
+        new Shark(World, free, Energy);
+    }
+}
+----
+
+.Improvement 3
+image::./img/improvement3.png[]
 

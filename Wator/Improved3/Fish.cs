@@ -40,7 +40,7 @@ namespace VPS.Wator.Improved3
             if (free.X != -1)
             {
                 // empty neighboring cell found -> create new fish there
-                Fish fish = new Fish(World, free, 0);
+                new Fish(World, free, 0);
                 // reduce the age of the parent fish to make sure it is allowed to 
                 // reproduce only every FishBreedTime steps
                 Age -= World.FishBreedTime;

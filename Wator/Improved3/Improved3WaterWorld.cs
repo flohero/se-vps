@@ -273,28 +273,14 @@ namespace VPS.Wator.Improved3
         // shuffle values of the matrix
         private void RandomizeMatrix(int[] matrix)
         {
-            // perform Knuth shuffle (http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
-            int temp, selectedRow, selectedCol;
-
-            int row = 0;
-            int col = 0;
-            for (int i = 0; i < Height * Width; i++)
+            int n = matrix.Length;
+            for (int i = 0; i < (n - 2); i++)
             {
-                temp = matrix[col + row * Width];
+                int j = random.Next(i, n);
+                var tmp = matrix[i];
+                matrix[i] = matrix[j];
+                matrix[j] = tmp;
 
-                // select random element from remaining elements
-                // already processed elements must not be chosen a second time
-                selectedRow = random.Next(row, Height);
-                if (selectedRow == row) selectedCol = random.Next(col, Width);  // current row selected -> select from remaining columns
-                else selectedCol = random.Next(Width);  // new row selected -> select any column
-
-                // swap
-                matrix[col + row * Width] = matrix[selectedCol + selectedRow * Width];
-                matrix[selectedCol + selectedRow * Width] = temp;
-
-                // incremet col and row
-                col++;
-                if (col >= Width) { col = 0; row++; }
             }
         }
     }
