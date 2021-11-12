@@ -17,9 +17,22 @@
 == 01
 
 == 02
-=== a
+=== Review of the Application
+*The application uses WinForms, which makes it non-portable or difficult to use for users, who don't want to use Windows.*
+A console application, which prints the statistics, would have been enough.
 
-=== b
+Some methods, like the GetNeighbors-Method, copy and paste code and change just a little bit.
+They can be simplified to be more DRY.
+Often the methods itself are way too long and should be broken up in smaller methods for readability.
+The classes do too much, for exampe the animals spawn themself and then the new animal places itself on the world map, instead of outsourcing this functionality to another class.
+
+The settings should be saved in a config file and not be hardcoded. 
+Newer dotnet(core) versions use appsettings.json for this, which would help with configuring the applicaiton.
+
+Since this exercise was on performance improvement, it was obvious that there is room for improvements of performance.
+
+
+=== Improvemetnts
 .Before any improvments
 image::./img/before-improvments.png[]
 ==== 1. Improvment
