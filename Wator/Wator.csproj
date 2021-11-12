@@ -145,6 +145,14 @@
       <DependentUpon>SettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Dummy\DummyWatorWorld.cs" />
+    <Compile Include="Improved3\Animal.cs" />
+    <Compile Include="Improved3\Fish.cs" />
+    <Compile Include="Improved3\Improved3WaterWorld.cs" />
+    <Compile Include="Improved3\Shark.cs" />
+    <Compile Include="Improved2\Animal.cs" />
+    <Compile Include="Improved2\Fish.cs" />
+    <Compile Include="Improved2\Improved2WaterWorld.cs" />
+    <Compile Include="Improved2\Shark.cs" />
     <Compile Include="IWatorWorld.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

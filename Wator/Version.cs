@@ -5,6 +5,8 @@ namespace VPS.Wator {
     // Add names of additional implementations here.
     DummyWatorWorld,
     OriginalWatorWorld,
-    Improved1WatorWorld
+    Improved1WatorWorld,
+    Improved2WatorWorld,
+    Improved3WatorWorld,
   }
 }
