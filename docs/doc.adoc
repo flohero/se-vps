@@ -14,28 +14,37 @@
 :img: ./img
 :imagesoutdir: ./out
 
-== 01
+<<<
+== Theory – Amuse-Gueule
+=== a
+image::img/speedup_and_effecienty.png[]
 
-== 02
+<<<
+=== b & c
+image::img/b_c.png[]
+
+<<<
+== Wator World
 === Review of the Application
-*The application uses WinForms, which makes it non-portable or difficult to use for users, who don't want to use Windows.*
-A console application, which prints the statistics, would have been enough.
+The application uses WinForms, which makes it non-portable or difficult to use for users, who don't want to use Windows.
 
 Some methods, like the GetNeighbors-Method, copy and paste code and change just a little bit.
 They can be simplified to be more DRY.
 Often the methods itself are way too long and should be broken up in smaller methods for readability.
-The classes do too much, for exampe the animals spawn themself and then the new animal places itself on the world map, instead of outsourcing this functionality to another class.
+The classes do too much, for example the animals spawn themself and then the new animal places itself on the world map, instead of outsourcing this functionality to another class.
 
 The settings should be saved in a config file and not be hardcoded. 
-Newer dotnet(core) versions use appsettings.json for this, which would help with configuring the applicaiton.
+Newer dotnet(core) versions use appsettings.json for this, which would help with configuring the application.
 
 Since this exercise was on performance improvement, it was obvious that there is room for improvements of performance.
 
-
-=== Improvemetnts
-.Before any improvments
+<<<
+=== Improvements
+.Before any improvements
 image::./img/before-improvments.png[]
-==== 1. Improvment
+
+<<<
+==== Improvement 1
 Instead of creating the neighbors array everytime the method is called, its made a list and a member of the class WatorWorld.
 Therefore, the workload on the garbage collector is reduced, and the array isn't recreated everytime the method is called.
 [source,csharp]
@@ -142,7 +151,8 @@ public Point SelectNeighbor(Type type, Point position)
 .Improvement 1
 image::./img/improvement1.png[]
 
-=== 2. Improvement
+<<<
+=== Improvement 2
 Convert all 2d Arrays to a one dimensional array.
 So instead of using `Grid[i, j]` it's `Grid[i + j * Width]`
 
@@ -249,8 +259,8 @@ private int[] GenerateRandomMatrix(int width, int height)
 .Improvement 2
 image::./img/improvement2.png[]
 
-
-=== 3. Improvement
+<<<
+=== Improvement 3
 The `RandomizeMatrix` Algorithm is replaced by the standard Knuth Shuffle and the `Shark.Spawn`-Method has been optimized.
 
 [source,csharp]
