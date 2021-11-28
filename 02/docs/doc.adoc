@@ -1,0 +1,96 @@
+= Exercise 02
+:author: Florian Weingartshofer
+:email: <S1910307103@students.fh-hagenberg.at>
+:reproducible:
+:experimental:
+:listing-caption: Listing
+:source-highlighter: rouge
+:rouge-style: github
+:toc:
+:sectnums:
+:sectnumlevels: 6
+:toclevels: 6
+// Variables
+:img: ./img
+:imagesoutdir: ./out
+
+== Race Conditions
+=== Simple Race Condition
+Two threads, both with "heavy" computation, try to increment the variable `i`.
+Here is the possibility that in the first thread i is incremented first, but not yet written back.
+Then the second thread increases i and writes the result back to i.
+After that the first thread writes its result to i.
+Thus i is effectively increased only once.
+
+[cols="2,2,1,2"]
+|===
+|Thread 1 |Thread 2 | | Value of `i`
+
+|
+|
+|
+|0
+
+|Read `i`
+|
+|
+|0
+
+|
+|Read `i`
+|
+|0
+
+|Increment `i`
+|
+|
+|0
+
+|
+|Increment `i`
+|
+|0
+
+|Write `i`
+|
+|
+|1
+
+|
+|Write `i`
+|
+|1
+|===
+
+.Race Condition
+[source,csharp]
+----
+include::../RaceConditions/Program.cs[lines=21..46]
+----
+
+The solution is to lock the part where `i` is incremented.
+This can be done with `lock` and a locking object.
+
+.No Race Condition
+[source,csharp]
+----
+include::../RaceConditions/Program.cs[lines=9..9]
+include::../RaceConditions/Program.cs[lines=48..82]
+----
+
+=== Race Condition Example
+The problem is that the writer doesn't stop writing to the buffer, while the reader waits for a signal from the writer.
+This way the writer might override stuff in the buffer, which wasn't read by the reader.
+An easy fix is to add a second signal for the writer to wait until the reader is done.
+This has to be implemented carefully, since there is the possibility of a dead lock if both reader and writer are waiting for a signal.
+
+[source,csharp]
+----
+include::../RaceConditions/RaceConditionExample.cs[]
+----
+
+== Synchronization Primitives
+[source,csharp]
+----
+include::../LimitedConnectionsExample/LimitedConnectionsExample.cs[]
+----

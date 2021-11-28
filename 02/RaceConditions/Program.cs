@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace RaceConditions
@@ -10,12 +9,14 @@ namespace RaceConditions
 
         private static void Main()
         {
-            Console.WriteLine("With Race Condition");
+            /*Console.WriteLine("With Race Condition");
             WithRaceCondition();
             Console.WriteLine();
             
             Console.WriteLine("Without Race Condition");
-            WithoutRaceCondition();
+            WithoutRaceCondition();*/
+
+            new RaceConditionExample().Run();
         }
 
         private static void WithRaceCondition()
@@ -24,7 +25,7 @@ namespace RaceConditions
             var startTime = DateTime.Now.AddSeconds(1);
             var t1 = new Thread(() =>
             {
-                while (DateTime.Now <= startTime)
+                while (DateTime.Now <= startTime) // Expensive computations
                 {
                 }
                 i++;
@@ -32,7 +33,7 @@ namespace RaceConditions
             });
             var t2 = new Thread(() =>
             {
-                while (DateTime.Now <= startTime)
+                while (DateTime.Now <= startTime) // Expensive computations
                 {
                 }
                 i++;
@@ -58,7 +59,7 @@ namespace RaceConditions
             var startTime = DateTime.Now.AddSeconds(1);
             var t1 = new Thread(() =>
             {
-                while (DateTime.Now <= startTime)
+                while (DateTime.Now <= startTime) // Expensive computations
                 {
                 }
 
@@ -67,7 +68,7 @@ namespace RaceConditions
             });
             var t2 = new Thread(() =>
             {
-                while (DateTime.Now <= startTime)
+                while (DateTime.Now <= startTime) // Expensive computations
                 {
                 }
 
