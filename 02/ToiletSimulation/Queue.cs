@@ -1,34 +1,36 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace VPS.ToiletSimulation
+namespace ToiletSimulation
 {
-  public abstract class Queue : IQueue
-  {
-    protected readonly IList<IJob> queue;
-    protected int producersComplete;
-
-    protected Queue()
+    public abstract class Queue : IQueue
     {
-      queue = new List<IJob>();
+        protected readonly IList<IJob> queue;
+        protected int producersComplete;
+
+        protected Queue()
+        {
+            queue = new List<IJob>();
+        }
+
+        public abstract void Enqueue(IJob job);
+
+        public abstract bool TryDequeue(out IJob job);
+
+        public virtual void CompleteAdding()
+        {
+            Interlocked.Increment(ref producersComplete);
+        }
+
+        public virtual bool IsCompleted
+        {
+            get
+            {
+                lock (queue)
+                {
+                    return producersComplete == Parameters.Producers && queue.Count == 0;
+                }
+            }
+        }
     }
-
-    public abstract void Enqueue(IJob job);
-
-    public abstract bool TryDequeue(out IJob job);
-
-    public virtual void CompleteAdding()
-    {
-      Interlocked.Increment(ref producersComplete);
-    }
-
-    public virtual bool IsCompleted
-    {
-      get
-      {
-        lock (queue) return producersComplete == Parameters.Producers && queue.Count == 0;
-      }
-    }
-  }
 }

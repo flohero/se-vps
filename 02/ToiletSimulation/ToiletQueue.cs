@@ -1,25 +1,25 @@
 using System;
 
-namespace VPS.ToiletSimulation
+namespace ToiletSimulation
 {
-  public class ToiletQueue : Queue
-  {
-    public override void Enqueue(IJob job)
+    public class ToiletQueue : Queue
     {
-      // TODO ...
-      throw new NotImplementedException();
-    }
+        public override void Enqueue(IJob job)
+        {
+            // TODO ...
+            throw new NotImplementedException();
+        }
 
-    public override bool TryDequeue(out IJob job)
-    {
-      // TODO ...
-      throw new NotImplementedException();
-    }
+        public override bool TryDequeue(out IJob job)
+        {
+            // TODO ...
+            throw new NotImplementedException();
+        }
 
-    public override void CompleteAdding()
-    {
-      // TODO ...
-      throw new NotImplementedException();
+        public override void CompleteAdding()
+        {
+            // TODO ...
+            throw new NotImplementedException();
+        }
     }
-  }
 }

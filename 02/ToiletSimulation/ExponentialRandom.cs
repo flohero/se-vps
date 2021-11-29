@@ -1,21 +1,21 @@
 using System;
 
-namespace VPS.ToiletSimulation
+namespace ToiletSimulation
 {
-  public class ExponentialRandom
-  {
-    private readonly double lambda;
-    private readonly Random random;
-
-    public ExponentialRandom(Random random, double lambda)
+    public class ExponentialRandom
     {
-      this.random = random;
-      this.lambda = lambda;
-    }
+        private readonly double lambda;
+        private readonly Random random;
 
-    public double NextDouble()
-    {
-      return -Math.Log(random.NextDouble()) / lambda;
+        public ExponentialRandom(Random random, double lambda)
+        {
+            this.random = random;
+            this.lambda = lambda;
+        }
+
+        public double NextDouble()
+        {
+            return -Math.Log(random.NextDouble()) / lambda;
+        }
     }
-  }
 }
