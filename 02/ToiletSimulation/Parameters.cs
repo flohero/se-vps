@@ -6,7 +6,7 @@ namespace ToiletSimulation
         public static int Producers => 2;
 
         // number of generated jobs per producer
-        public static int JobsPerProducer => 50;
+        public static int JobsPerProducer => 200;
 
         // number of consumers
         public static int Consumers => 2;

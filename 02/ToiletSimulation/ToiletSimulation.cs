@@ -9,7 +9,7 @@ namespace ToiletSimulation
             var randomSeed = new Random().Next();
             IQueue q;
 
-            q = new FIFOQueue();
+            q = new ToiletQueue();
             TestQueue(q, randomSeed);
 
             // q = new ToiletQueue();
