@@ -90,6 +90,11 @@ include::../RaceConditions/RaceConditionExample.cs[]
 ----
 
 == Synchronization Primitives
+To limit the number of threads, the ThreadPool is used, with a maximum number of threads.
+
+For the `DownloadFiles` method a `ThreadPool` is used, but to synchronize all threads with the main-thread a `ManualResetEvent` is used. 
+The ManuelResetEvent blocks the main-thread until all downloads are finished.
+
 [source,csharp]
 ----
 include::../LimitedConnectionsExample/LimitedConnectionsExample.cs[]

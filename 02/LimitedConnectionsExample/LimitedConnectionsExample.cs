@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace LimitedConnectionsExample
@@ -8,37 +10,35 @@ namespace LimitedConnectionsExample
         public static void Main()
         {
             var l = new LimitedConnectionsExample();
+            l.DownloadFiles(new[]
+                {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"});
         }
 
         public void DownloadFilesAsync(IEnumerable<string> urls)
         {
-            var threads = new List<Thread>();
+            if (!ThreadPool.SetMaxThreads(10, 10))
+                throw new Exception("Cannot set min/max threads");
             foreach (var url in urls)
             {
-                if (threads.Count == 10)
-                {
-                    // Wait for all 10 files to finish downloading, then start downloading remaining files
-                    threads.ForEach(t => t.Join());
-                    threads.Clear();
-                }
-
-                var t = new Thread(DownloadFile);
-                t.Start(url);
-                threads.Add(t);
+                ThreadPool.QueueUserWorkItem(DownloadFile, url);
             }
         }
 
         public void DownloadFiles(IEnumerable<string> urls)
         {
-            var threads = new List<Thread>();
+            var toProcess = urls.Count();
+            using ManualResetEvent resetEvent = new ManualResetEvent(false);
             foreach (var url in urls)
             {
-                var t = new Thread(DownloadFile);
-                t.Start(url);
-                threads.Add(t);
+                ThreadPool.QueueUserWorkItem(x =>
+                {
+                    DownloadFile(x);
+                    if (Interlocked.Decrement(ref toProcess) == 0)
+                        resetEvent.Set();
+                }, url);
             }
-            // Wait for all files to finish downloading
-            threads.ForEach(t => t.Join());
+
+            resetEvent.WaitOne();
         }
 
         private void DownloadFile(object url)
