@@ -5,7 +5,7 @@ namespace ToiletSimulation
 {
     public abstract class Queue : IQueue
     {
-        protected readonly List<IJob> queue;
+        protected readonly IList<IJob> queue;
         protected int producersComplete;
 
         protected Queue()

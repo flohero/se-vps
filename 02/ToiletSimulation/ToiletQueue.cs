@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Threading;
 
 namespace ToiletSimulation
@@ -9,12 +7,13 @@ namespace ToiletSimulation
     {
         private readonly Semaphore _sem =
             new(0, Parameters.Producers * Parameters.JobsPerProducer);
+
         public override void Enqueue(IJob job)
         {
             lock (queue)
             {
                 int i;
-                for (i = 0; i < queue.Count && job.DueDate.CompareTo(queue[i].DueDate) > 0; i++)
+                for (i = 0; i < queue.Count && job.DueDate.CompareTo(queue[i].DueDate) >= 0; i++)
                 {
                 }
 
@@ -31,6 +30,16 @@ namespace ToiletSimulation
             {
                 if (queue.Count > 0)
                 {
+                    // Check for jobs, whose due date is not in the past
+                    for (var i = 0; i < queue.Count; i++)
+                    {
+                        var j = queue[i];
+                        if (j.DueDate <= DateTime.Now) continue;
+                        job = j;
+                        queue.RemoveAt(i);
+                        return true;
+                    }
+                    // If there are none just return the first one
                     job = queue[0];
                     queue.RemoveAt(0);
                     return true;

@@ -105,7 +105,7 @@ include::../LimitedConnectionsExample/LimitedConnectionsExample.cs[]
 `a` and `b` have been implemented during the lecture.
 Here are the test results:
 
-.Test Results
+.Fifo Queue Test Results
 |===
 | |Jobs |Starved Jobs |Starvation Ratio |Total Waiting Time |Mean Waiting Time
 
@@ -159,3 +159,70 @@ Here are the test results:
 |0.000004450011248
 |===
 
+=== Priority Ignore Irrelevant Jobs Queue aka Toilet Queue
+Instead of a fifo queue, the toilet queue is implemented as a priority queue.
+This places jobs that are due earlier than others at the top of the queue.
+In addition to using a priority queue, the toilet queue ignores jobs whose due date is in the past,
+if there are still orders whose due date is in the future.
+
+.Toilet Queue
+[source,csharp]
+----
+include::../ToiletSimulation/ToiletQueue.cs[]
+----
+
+The test results show that the priority queue is way better at not letting threads starve.
+
+.Toilet Queue Test Results
+|===
+| |Jobs |Starved Jobs |Starvation Ratio |Total Waiting Time |Mean Waiting Time
+
+|1
+|400
+|32
+|8.00%
+|00:01:12.394
+|00:00:00.181
+
+|2
+|400
+|133
+|33.25%
+|00:02:09.311
+|00:00:00.323
+
+|3
+|400
+|41
+|10.25%
+|00:00:58.051
+|00:00:00.145
+
+|4
+|400
+|47
+|11.75%
+|00:01:25.528
+|00:00:00.214
+
+|5
+|400
+|58
+|14.50%
+|00:01:22.769
+|00:00:00.207
+
+|*Mean*
+|400
+|62.2
+|15.55%
+|00:01:25.611
+|00:00:00.214
+
+|*Standard Deviation*
+|0
+|40.69029368
+|0.1017257342
+|0.0003090556546
+|0.0000007726392076
+|===
