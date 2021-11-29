@@ -79,10 +79,10 @@ include::../RaceConditions/Program.cs[lines=48..82]
 ----
 
 === Race Condition Example
-The problem is that the writer doesn't stop writing to the buffer, while the reader waits for a signal from the writer.
-This way the writer might override stuff in the buffer, which wasn't read by the reader.
-An easy fix is to add a second signal for the writer to wait until the reader is done.
-This has to be implemented carefully, since there is the possibility of a dead lock if both reader and writer are waiting for a signal.
+Instead of using an `AutoResetEvent` two semaphores are used, to fully use the buffer.
+An semaphore is created, which counts the times the buffer was emptied, and another which counts the newly added elements.
+Through that mechanism the buffer can be fully filled, but it does not override elements, which have not been read.
+Instead of using two semaphores it is possible to use two `AutoResetEvents`, but this will not utilize the whole buffer.
 
 [source,csharp]
 ----
@@ -94,3 +94,63 @@ include::../RaceConditions/RaceConditionExample.cs[]
 ----
 include::../LimitedConnectionsExample/LimitedConnectionsExample.cs[]
 ----
+
+== Toilet Simulation
+=== Fifo Queue
+`a` and `b` have been implemented during the lecture.
+Here are the test results:
+
+.Test Results
+|===
+| |Jobs |Starved Jobs |Starvation Ratio |Total Waiting Time |Mean Waiting Time
+
+|1
+|400
+|261
+|65.25%
+|00:04:15.282
+|00:00:00.638
+
+|2
+|400
+|309
+|77.25%
+|00:06:10.973
+|00:00:00.927
+
+|3
+|400
+|57
+|14.24%
+|00:01:16.022
+|00:00:00.190
+
+|4
+|400
+|319
+|79.75%
+|00:05:50.957
+|00:00:00.877
+
+|5
+|400
+|349
+|87.25%
+|00:08:07.456
+|00:00:01.219
+
+|*Mean*
+|400
+|259
+|64.75%
+|00:05:08.138
+|00:00:00.770
+
+|*Standard Deviation*
+|0
+|117.2689217
+|0.2932153679
+|0.001780004569
+|0.000004450011248
+|===
+

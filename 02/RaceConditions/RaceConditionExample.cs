@@ -9,14 +9,14 @@ namespace RaceConditions
         private const int BUFFER_SIZE = 10;
 
         private double[] buffer;
-        private AutoResetEvent writerReady;
-        private AutoResetEvent readerReady;
+        private Semaphore _full;
+        private Semaphore _empty;
 
         public void Run()
         {
             buffer = new double[BUFFER_SIZE];
-            writerReady = new AutoResetEvent(false);
-            readerReady = new AutoResetEvent(false);
+            _full = new Semaphore(0, BUFFER_SIZE);
+            _empty = new Semaphore(BUFFER_SIZE, BUFFER_SIZE);
 
             // start threads 
             var t1 = new Thread(Reader);
@@ -34,9 +34,10 @@ namespace RaceConditions
             var readerIndex = 0;
             for (int i = 0; i < N; i++)
             {
-                readerReady.Set();
-                writerReady.WaitOne();
-                Console.WriteLine(buffer[readerIndex]);
+                _full.WaitOne();
+                lock (buffer)
+                    Console.WriteLine(buffer[readerIndex]);
+                _empty.Release();
                 readerIndex = (readerIndex + 1) % BUFFER_SIZE;
             }
         }
@@ -46,9 +47,10 @@ namespace RaceConditions
             var writerIndex = 0;
             for (int i = 0; i < N; i++)
             {
-                readerReady.WaitOne();
-                buffer[writerIndex] = i;
-                writerReady.Set();
+                _empty.WaitOne();
+                lock (buffer)
+                    buffer[writerIndex] = i;
+                _full.Release();
                 writerIndex = (writerIndex + 1) % BUFFER_SIZE;
             }
         }
