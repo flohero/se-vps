@@ -14,6 +14,7 @@
 :img: ./img
 :imagesoutdir: ./out
 
+<<<
 == Race Conditions
 === Simple Race Condition
 Two threads, both with "heavy" computation, try to increment the variable `i`.
@@ -69,7 +70,8 @@ include::../RaceConditions/Program.cs[lines=21..46]
 ----
 
 The solution is to lock the part where `i` is incremented.
-This can be done with `lock` and a locking object.
+This can be done with `lock` and a locking object 
+or alternatively the `Interlocked.Increment` method can be used, which would be a little bit shorter.
 
 .No Race Condition
 [source,csharp]
@@ -78,6 +80,7 @@ include::../RaceConditions/Program.cs[lines=9..9]
 include::../RaceConditions/Program.cs[lines=48..82]
 ----
 
+<<<
 === Race Condition Example
 Instead of using an `AutoResetEvent` two semaphores are used, to fully use the buffer.
 An semaphore is created, which counts the times the buffer was emptied, and another which counts the newly added elements.
@@ -89,6 +92,7 @@ Instead of using two semaphores it is possible to use two `AutoResetEvents`, but
 include::../RaceConditions/RaceConditionExample.cs[]
 ----
 
+<<<
 == Synchronization Primitives
 To limit the number of threads, the ThreadPool is used, with a maximum number of threads.
 
@@ -100,6 +104,7 @@ The ManuelResetEvent blocks the main-thread until all downloads are finished.
 include::../LimitedConnectionsExample/LimitedConnectionsExample.cs[]
 ----
 
+<<<
 == Toilet Simulation
 === Fifo Queue
 `a` and `b` have been implemented during the lecture.
