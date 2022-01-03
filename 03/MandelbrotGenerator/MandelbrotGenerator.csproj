@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Area.cs" />
     <Compile Include="AsyncThreadImageGenerator.cs" />
+    <Compile Include="BackgroundWorkerImageGenerator.cs" />
     <Compile Include="ColorSchema.cs" />
     <Compile Include="EventArgs.cs" />
     <Compile Include="SyncImageGenerator.cs" />

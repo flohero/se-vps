@@ -12,6 +12,7 @@ namespace MandelbrotGenerator
 
         public void GenerateImage(Area area)
         {
+            // Cancel previous calculations
             cts?.Cancel(false);
             cts = new CancellationTokenSource();
             var thread = new Thread(Run);
