@@ -67,6 +67,7 @@
     <Compile Include="BackgroundWorkerImageGenerator.cs" />
     <Compile Include="ColorSchema.cs" />
     <Compile Include="EventArgs.cs" />
+    <Compile Include="PartitionedImageGenerator.cs" />
     <Compile Include="SyncImageGenerator.cs" />
     <Compile Include="IImageGenerator.cs" />
     <Compile Include="MainForm.cs">

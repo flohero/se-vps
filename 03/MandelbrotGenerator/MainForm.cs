@@ -33,7 +33,7 @@ namespace MandelbrotGenerator
                 Height = pictureBox.Height
             };
 
-            generator = new BackgroundWorkerImageGenerator();
+            generator = new PartitionedImageGenerator();
             generator.ImageGenerated += generator_OnImageGenerated;
         }
 
