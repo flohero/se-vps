@@ -17,19 +17,8 @@ namespace MandelbrotGenerator
         public PartitionedImageGenerator()
         {
             var settings = Settings.DefaultSettings;
-            if (settings.Workers == 1)
-            {
-                cols = 1;
-                rows = 1;
-            }
-            else
-            {
-                cols = (int) Math.Ceiling((double) settings.Workers / 2);
-                rows = (int) Math.Floor((double) settings.Workers / 2);
-            }
-
-            Console.WriteLine("Cols: " + cols);
-            Console.WriteLine("Rows: " + rows);
+            cols = settings.Workers;
+            rows = 1; // keep the possibility to use multiple rows
         }
 
         public void GenerateImage(Area area)
@@ -39,8 +28,8 @@ namespace MandelbrotGenerator
             cts = new CancellationTokenSource();
             var fractionWidth = (int) Math.Floor((double) area.Width / cols);
             var fractionHeight = (int) Math.Floor((double) area.Height / rows);
-            var areas = ((int) Math.Ceiling((double) area.Width / fractionWidth)) *
-                        ((int) Math.Ceiling((double) area.Height / fractionHeight));
+            var areas = (int) Math.Ceiling((double) area.Width / fractionWidth) *
+                        (int) Math.Ceiling((double) area.Height / fractionHeight);
             bitmaps = new Bitmap[areas];
             var index = 0;
             for (var i = 0; i * fractionWidth < area.Width; i++)
@@ -92,12 +81,13 @@ namespace MandelbrotGenerator
             {
                 for (var j = 0; j < bitmap.Height; j++)
                 {
-                    cReal = area.MinReal + (i + startWidth) * area.PixelWidth; // extract starting points based on the grid position
+                    cReal = area.MinReal +
+                            (i + startWidth) * area.PixelWidth; // extract starting points based on the grid position
                     cImg = area.MinImg + (j + startHeight) * area.PixelHeight;
                     zReal = 0.0;
                     zImg = 0.0;
                     var k = 0;
-                    while (zReal * zReal + zImg * zImg < zBorder && k < maxIterations) 
+                    while (zReal * zReal + zImg * zImg < zBorder && k < maxIterations)
                     {
                         zNewReal = zReal * zReal - zImg * zImg + cReal;
                         zNewImg = 2 * zReal * zImg + cImg;
@@ -105,7 +95,7 @@ namespace MandelbrotGenerator
                         zImg = zNewImg;
                         k++;
                     }
-                    
+
                     if (token.IsCancellationRequested)
                     {
                         return null;
