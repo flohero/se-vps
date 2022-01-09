@@ -27,26 +27,17 @@ namespace MandelbrotGenerator
             cts?.Cancel(false);
             cts = new CancellationTokenSource();
             var fractionWidth = (int) Math.Floor((double) area.Width / cols);
-            var fractionHeight = (int) Math.Floor((double) area.Height / rows);
-            var areas = (int) Math.Ceiling((double) area.Width / fractionWidth) *
-                        (int) Math.Ceiling((double) area.Height / fractionHeight);
+            var areas = (int) Math.Ceiling((double) area.Width / fractionWidth);
             bitmaps = new Bitmap[areas];
             var index = 0;
             for (var i = 0; i * fractionWidth < area.Width; i++)
             {
                 var startWidth = i * fractionWidth;
                 var endWidth = startWidth + fractionWidth > area.Width ? area.Width : startWidth + fractionWidth;
-                for (var j = 0; j * fractionHeight < area.Height; j++)
-                {
-                    var startHeight = j * fractionHeight;
-                    var endHeight = startHeight + fractionHeight > area.Height
-                        ? area.Height
-                        : startHeight + fractionHeight;
-                    var thread = new Thread(Run);
-                    thread.Start(new Tuple<Area, int, int, int, int, int, CancellationToken>(area, startWidth, endWidth,
-                        startHeight, endHeight, index, cts.Token));
-                    index++;
-                }
+                var thread = new Thread(Run);
+                thread.Start(new Tuple<Area, int, int, int, int, int, CancellationToken>(area, startWidth, endWidth, 0,
+                    area.Height, index, cts.Token));
+                index++;
             }
         }
 
