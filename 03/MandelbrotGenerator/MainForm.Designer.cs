@@ -123,7 +123,7 @@
       this.pictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
       this.pictureBox.Location = new System.Drawing.Point(12, 27);
       this.pictureBox.Name = "pictureBox";
-      this.pictureBox.Size = new System.Drawing.Size(335, 253);
+      this.pictureBox.Size = new System.Drawing.Size(800, 600);
       this.pictureBox.TabIndex = 2;
       this.pictureBox.TabStop = false;
       this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
@@ -141,7 +141,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(359, 305);
+      this.ClientSize = new System.Drawing.Size(815, 650);
       this.Controls.Add(this.pictureBox);
       this.Controls.Add(this.statusStrip);
       this.Controls.Add(this.menuStrip);

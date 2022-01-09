@@ -53,4 +53,19 @@ include::../MandelbrotGenerator/PartitionedImageGenerator.cs[]
 ----
 
 == Tests
+Ten independent testruns with the following settings:
+[source,csharp]
+----
+public Settings() {
+    MinReal = -1.4; 
+    MinImg = -0.1;
+    MaxReal = -1.32; 
+    MaxImg = -0.02;
+    maxIterations = 10000;
+    zBorder = 4.0;
+    workers = 2;
+}
+----
 
+.Testruns
+image::img/testruns.png[]

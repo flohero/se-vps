@@ -52,6 +52,7 @@ namespace MandelbrotGenerator
                 currentArea = e.Value.Item1;
                 pictureBox.Image = e.Value.Item2;
                 toolStripStatusLabel.Text = "Done (Runtime: " + e.Value.Item3.ToString() + ")";
+                Console.WriteLine(e.Value.Item3.ToString());
             }
         }
 

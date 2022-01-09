@@ -60,7 +60,7 @@ namespace MandelbrotGenerator
                 for (var j = 0; j < area.Height; j++)
                 {
                     cReal = area.MinReal + i * area.PixelWidth; // extract starting points based on the grid position
-                    cImg = area.MinImg + j * area.PixelWidth;
+                    cImg = area.MinImg + j * area.PixelHeight;
                     zReal = 0; // sequence variable = current value
                     zImg = 0;
 

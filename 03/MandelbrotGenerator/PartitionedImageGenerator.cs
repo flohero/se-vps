@@ -60,7 +60,6 @@ namespace MandelbrotGenerator
             sw.Start();
             var bitmap = GenerateMandelbrotSetPart(area, tuple.Item2, tuple.Item3, tuple.Item4, tuple.Item5, token);
             sw.Stop();
-            Console.WriteLine($"{index} took {sw.Elapsed}");
             OnImageGenerated(area, bitmap, sw.Elapsed, index);
         }
 
