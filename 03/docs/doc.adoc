@@ -35,6 +35,7 @@ include::../MandelbrotGenerator/AsyncThreadImageGenerator.cs[]
 
 Another ImageGenerator was implemented using a BackgroundWorker.
 A problem was that the BackgroundWorker could not be cancelled and started again, so it is just re-instantiated.
+To cancel a backgroundWorker the `CancelAsync` method is used.
 
 .BackgroundWorkerImageGenerator
 [source,csharp]
@@ -45,6 +46,8 @@ include::../MandelbrotGenerator/BackgroundWorkerImageGenerator.cs[]
 == Partition the Work
 The area is partitioned according to the number of available workers.
 The underlying implementation uses threads to generate the different parts of the image.
+The image is split into columns, and then merged after each thread is done generating the image.
+For synchronization a cancellationToken is used and each thread saves its part into a bitmap array, which is merged into one bitmap, after all threads are done.
 
 .PartitionedImageGenerator
 [source,csharp]

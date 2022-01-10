@@ -11,14 +11,12 @@ namespace MandelbrotGenerator
         public event EventHandler<EventArgs<Tuple<Area, Bitmap, TimeSpan>>> ImageGenerated;
         private CancellationTokenSource cts;
         private readonly int cols;
-        private readonly int rows;
         private Bitmap[] bitmaps;
 
         public PartitionedImageGenerator()
         {
             var settings = Settings.DefaultSettings;
             cols = settings.Workers;
-            rows = 1; // keep the possibility to use multiple rows
         }
 
         public void GenerateImage(Area area)
