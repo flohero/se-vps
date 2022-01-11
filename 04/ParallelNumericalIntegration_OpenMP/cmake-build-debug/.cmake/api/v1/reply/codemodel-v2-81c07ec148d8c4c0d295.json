@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.21"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "ParallelNumericalIntegration_OpenMP",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ParallelNumericalIntegration_OpenMP::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ParallelNumericalIntegration_OpenMP-Release-52ca5f3f32c3d8d8af43.json",
+					"name" : "ParallelNumericalIntegration_OpenMP",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/florian/projects/fh/semester5/vps/exercises/04/ParallelNumericalIntegration_OpenMP/cmake-build-debug",
+		"source" : "/home/florian/projects/fh/semester5/vps/exercises/04/ParallelNumericalIntegration_OpenMP"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
