@@ -1,0 +1,78 @@
+= Exercise 05
+:author: Florian Weingartshofer <S1910307103@fhooe.at>
+:reproducible:
+:experimental:
+:listing-caption: Listing
+:source-highlighter: rouge
+:rouge-style: github
+:toc:
+:sectnums:
+:sectnumlevels: 6
+:toclevels: 6
+// Variables
+:img: ./img
+:imagesoutdir: ./out
+
+== Stock Visualization
+An asynchronous implementation of the stock visualization.
+Most of the work has been done during the lecture.
+
+.Sequential
+[source,csharp]
+----
+include::../Quandl.UI/QuandlViewer.cs[lines=32..46]
+----
+
+=== With TPL
+
+.TPL
+[source,csharp]
+----
+include::../Quandl.UI/QuandlViewer.cs[lines=89..115]
+----
+
+=== With async/await
+The async/await version is shorter than the TPL approach.
+
+.async/await
+[source,csharp]
+----
+include::../Quandl.UI/QuandlViewer.cs[lines=117..134]
+----
+
+== Wator World
+=== Approach
+The matrix of wator world is divided into mutliple parts, this can be done with an partitioner.
+The number of partitions should be even or it will produce race conditions.
+
+.Partitioning the matrix
+[source,csharp]
+----
+include::../Wator/Improved4/Improved4WaterWorld.cs[lines=91..91]
+----
+
+The matrix randomization algorithm implements two new parameters for upper and lower bounds.
+
+[source,csharp]
+----
+include::../Wator/Improved4/Improved4WaterWorld.cs[lines=301..310]
+----
+
+Last each partition is executed.
+
+[source,csharp]
+----
+include::../Wator/Improved4/Improved4WaterWorld.cs[lines=104..153]
+----
+
+*Advantages*
+
+- Simple by using async/await
+- really fast
+
+*Disadvantages*
+
+- Not the whole matrix gets randomized, but only parts of it
+
+=== Comparison
+image::img/image-2022-02-13-19-18-05-523.png[]

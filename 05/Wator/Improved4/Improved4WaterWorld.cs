@@ -10,19 +10,25 @@ namespace VPS.Wator.Improved4
     // initial object-oriented implementation of the Wator world simulation
     public class Improved4WatorWorld : IWatorWorld
     {
-        private Random random;
+        private const int MaxPartitionSize = 16;
 
+        private readonly Random random;
+        // A matrix of ints that determines the order of execution for each cell of the world.
+        // This matrix is shuffled in each time step.
+        // Cells of the world must be executed in a random order,
+        // otherwise the animal in the first cell is always allowed to move first.
+        private int[] randomMatrix;
+        
         // for visualization
         private byte[] rgbValues;
-
-        private int[] randomMatrix;
-
+        
         private readonly OrderablePartitioner<Tuple<int, int>> partitioner;
 
         #region Properties
-        public int Width { get; private set; }  // width (number of cells) of the world
-        public int Height { get; private set; }  // height (number of cells) of the world
-        public Animal[] Grid { get; private set; }  // the cells of the world (2D-array of animal (fish or shark), empty cells have the value null)
+        public int Width { get; private set; } // width (number of cells) of the world
+        public int Height { get; private set; } // height (number of cells) of the world
+
+        public Animal[]  Grid { get; private set; } // the cells of the world (2D-array of animal (fish or shark), empty cells have the value null)
 
         // simulation parameters
         public int InitialFishPopulation { get; private set; }
@@ -50,24 +56,30 @@ namespace VPS.Wator.Improved4
             random = new Random();
             Grid = new Animal[Width * Height];
 
-            // Don't randomize matrix initially
+            // populate the random matrix that determines the order of execution for the cells
             randomMatrix = GenerateMatrix(Width, Height, false);
 
-
-            // Randomize positions
+            // Initialize the population by placing the required number of shark and fish
+            // randomly on the grid.
+            // randomMatrix contains all values from 0 .. Width*Height in a random ordering
+            // so we can simply place a fish onto a cell if the value in the same cell of the
+            // randomMatrix is smaller then the number of fish 
+            // subsequently we can place a shark if the number in randomMatrix is smaller than
+            // the number of fish and shark
             var initialMatrix = GenerateMatrix(Width, Height, true);
-            for (int col = 0; col < Width; col++)
+            for (var col = 0; col < Width; col++)
             {
-                for (int row = 0; row < Height; row++)
+                for (var row = 0; row < Height; row++)
                 {
-                    int value = initialMatrix[MapIndex(row, col)];
+                    var value = initialMatrix[MapIndex(row, col)];
                     if (value < InitialFishPopulation)
                     {
                         Grid[MapIndex(row, col)] = new Fish(this, new Point(col, row), random.Next(0, FishBreedTime));
                     }
                     else if (value < InitialFishPopulation + InitialSharkPopulation)
                     {
-                        Grid[MapIndex(row, col)] = new Shark(this, new Point(col, row), random.Next(0, SharkBreedEnergy));
+                        Grid[MapIndex(row, col)] =
+                            new Shark(this, new Point(col, row), random.Next(0, SharkBreedEnergy));
                     }
                     else
                     {
@@ -76,37 +88,54 @@ namespace VPS.Wator.Improved4
                 }
             }
 
-            for (int partitionSize = 4; partitionSize < Height; partitionSize++)
-            {
-                partitioner = Partitioner.Create(0, Height, partitionSize);
-                if (partitioner.GetDynamicPartitions().ToList().Count() % 2 == 0)
-                {
-                    break;
-                }
-            }
+            partitioner = Partitioner.Create(0, Height, MaxPartitionSize);
         }
 
+        // Execute one time step of the simulation. Each cell of the world must be executed once.
+        // Animals move around on the grid. To make sure each animal is executed only once we
+        // use the moved flag.
         public void ExecuteStep()
         {
-            Task.Run(ExecuteStepAsync).Wait();
+            Task.Run(async () =>
+            {
+                // First execute the even partitions then the odd so we do not produce race conditions
+                ICollection<Task> tasks = new List<Task>();
+                var partitions = partitioner.GetDynamicPartitions().ToArray();
+                for (var i = 0; i < partitions.Length; i += 2)
+                {
+                    tasks.Add(ExecutePartAsync(partitions[i].Item1, partitions[i].Item2));
+                }
+                await Task.WhenAll(tasks);
+                tasks.Clear();
+                
+                for (var i = 1; i < partitions.Length; i += 2)
+                {
+                    tasks.Add(ExecutePartAsync(partitions[i].Item1, partitions[i].Item2));
+                }
+                await Task.WhenAll(tasks);
+                
+                for (var col = 0; col < Width; col++)
+                {
+                    for (var row = 0; row < Height; row++)
+                    {
+                        Grid[MapIndex(row, col)]?.Commit();
+                    }
+                }
+            }).Wait();
         }
 
-        private Task ExecutePartitionAsync(int lowerHeight, int upperHeight)
+        private Task ExecutePartAsync(int lower, int upper)
         {
             return Task.Run(() =>
             {
-                RandomizeMatrix(randomMatrix, lowerHeight, upperHeight);
-
-                int randomRow, randomCol;
-                for (int col = 0; col < Width; col++)
+                RandomizeMatrix(randomMatrix, lower, upper);
+                for (var col = 0; col < Width; col++)
                 {
-                    for (int row = lowerHeight; row < upperHeight; row++)
+                    for (var row = lower; row < upper; row++)
                     {
-                        randomCol = randomMatrix[MapIndex(row, col)] % Width;
-                        randomRow = randomMatrix[MapIndex(row, col)] / Width;
-
+                        var randomCol = randomMatrix[MapIndex(row, col)] % Width;
+                        var randomRow = randomMatrix[MapIndex(row, col)] / Width;
                         var animal = Grid[MapIndex(randomRow, randomCol)];
-
                         if (animal != null && !animal.Moved)
                         {
                             animal.ExecuteStep();
@@ -116,58 +145,24 @@ namespace VPS.Wator.Improved4
             });
         }
 
-        private async Task ExecuteStepAsync()
-        {
-            var partitions = partitioner.GetDynamicPartitions().ToList();
-            ICollection<Task> tasks = new List<Task>();
-
-            // Execute even partitions
-            for (int i = 0; i < partitions.Count; i += 2)
-            {
-                tasks.Add(ExecutePartitionAsync(partitions[i].Item1, partitions[i].Item2));
-            }
-
-            await Task.WhenAll(tasks);
-            tasks.Clear();
-
-            // Execute uneven partitions
-            for (int i = 1; i < partitions.Count; i += 2)
-            {
-                tasks.Add(ExecutePartitionAsync(partitions[i].Item1, partitions[i].Item2));
-            }
-
-            await Task.WhenAll(tasks);
-
-            // Commit all animals in the grid to prepare for the next simulation step
-            for (int col = 0; col < Width; col++)
-            {
-                for (int row = 0; row < Height; row++)
-                {
-                    Grid[MapIndex(row, col)]?.Commit();
-                }
-            }
-        }
-
         // generate bitmap for the current state of the Wator world
         public Bitmap GenerateImage()
         {
-            int counter = 0;
-            for (int row = 0; row < Height; row++)
+            var counter = 0;
+            for (var x = 0; x < Height; x++)
             {
-                for (int col = 0; col < Width; col++)
+                for (var y = 0; y < Width; y++)
                 {
-                    Color color;
-                    if (Grid[MapIndex(row, col)] == null) color = Color.DarkBlue;
-                    else color = Grid[MapIndex(row, col)].Color;
+                    var col = Grid[MapIndex(x, y)] == null ? Color.DarkBlue : Grid[MapIndex(x, y)].Color;
 
-                    rgbValues[counter++] = color.B; // blue
-                    rgbValues[counter++] = color.G; // green
-                    rgbValues[counter++] = color.R; // red
-                    rgbValues[counter++] = color.A; // alpha
+                    rgbValues[counter++] = col.B; // blue
+                    rgbValues[counter++] = col.G; // green
+                    rgbValues[counter++] = col.R; // red
+                    rgbValues[counter++] = col.A; // alpha
                 }
             }
 
-            Rectangle rect = new Rectangle(0, 0, Width, Height);
+            var rect = new Rectangle(0, 0, Width, Height);
             var bitmap = new Bitmap(Width, Height);
             System.Drawing.Imaging.BitmapData bmpData = null;
             try
@@ -176,7 +171,7 @@ namespace VPS.Wator.Improved4
                 bmpData = bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, bitmap.PixelFormat);
 
                 // get the address of the first line
-                IntPtr ptr = bmpData.Scan0;
+                var ptr = bmpData.Scan0;
 
                 // copy RGB values back to the bitmap
                 System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, rgbValues.Length);
@@ -190,10 +185,10 @@ namespace VPS.Wator.Improved4
         }
 
         // find all neighboring cells of the given position and type
-        public List<Point> GetNeighbors(Type type, Point position)
+        private List<Point> GetNeighbors(Type type, Point position)
         {
-            // neighbour points
-            var points = new List<Point>();
+            //Point[] neighbors = new Point[4];
+            var neighbors = new List<Point>();
 
             // look north
             var i = position.X;
@@ -201,13 +196,14 @@ namespace VPS.Wator.Improved4
             var animal = Grid[MapIndex(j, i)];
             if (type == null && animal == null)
             {
-                points.Add(new Point(i, j));
+                neighbors.Add(new Point(i, j));
             }
             else if (type != null && type.IsInstanceOfType(animal))
             {
                 if (animal != null && !animal.Moved)
-                {  // ignore animals moved in the current iteration
-                    points.Add(new Point(i, j));
+                {
+                    // ignore animals moved in the current iteration
+                    neighbors.Add(new Point(i, j));
                 }
             }
             // look east
@@ -216,13 +212,13 @@ namespace VPS.Wator.Improved4
             animal = Grid[MapIndex(j, i)];
             if (type == null && animal == null)
             {
-                points.Add(new Point(i, j));
+                neighbors.Add(new Point(i, j));
             }
             else if (type != null && type.IsInstanceOfType(animal))
             {
                 if (animal != null && !animal.Moved)
                 {
-                    points.Add(new Point(i, j));
+                    neighbors.Add(new Point(i, j));
                 }
             }
             // look south
@@ -231,13 +227,13 @@ namespace VPS.Wator.Improved4
             animal = Grid[MapIndex(j, i)];
             if (type == null && animal == null)
             {
-                points.Add(new Point(i, j));
+                neighbors.Add(new Point(i, j));
             }
             else if (type != null && type.IsInstanceOfType(animal))
             {
                 if (animal != null && !animal.Moved)
                 {
-                    points.Add(new Point(i, j));
+                    neighbors.Add(new Point(i, j));
                 }
             }
             // look west
@@ -246,70 +242,67 @@ namespace VPS.Wator.Improved4
             animal = Grid[MapIndex(j, i)];
             if (type == null && animal == null)
             {
-                points.Add(new Point(i, j));
+                neighbors.Add(new Point(i, j));
             }
             else if (type != null && type.IsInstanceOfType(animal))
             {
                 if (animal != null && !animal.Moved)
                 {
-                    points.Add(new Point(i, j));
+                    neighbors.Add(new Point(i, j));
                 }
             }
 
-            return points;
+            // create result array that only contains found cells
+            //Point[] result = new Point[neighborIndex];
+            //Array.Copy(neighbors, result, neighborIndex);
+            return neighbors;
         }
 
         // select a random neighboring cell of the given position and type
         public Point SelectNeighbor(Type type, Point position)
         {
-            IList<Point> neighbors = GetNeighbors(type, position);  // find all neighbors of required type
+            IList<Point> neighbors = GetNeighbors(type, position); // find all neighbors of required type
             if (neighbors.Count > 1)
             {
-                return neighbors[random.Next(neighbors.Count)];  // return random neighbor (prevent bias)
+                return neighbors[random.Next(neighbors.Count)]; // return random neighbor (prevent bias)
             }
-            else if (neighbors.Count == 1)
-            {  // only one neighbor -> return without calling random
-                return neighbors[0];
-            }
-            else
-            {
-                return new Point(-1, -1);  // no neighbor found
-            }
+            return neighbors.Count == 1 ? neighbors[0] : new Point(-1, -1);
         }
 
         // create a matrix containing all numbers from 0 to width * height in random order
         private int[] GenerateMatrix(int width, int height, bool randomize)
         {
-            int[] matrix = new int[width * height];
+            var matrix = new int[width * height];
 
-            int row = 0;
-            int col = 0;
-            for (int i = 0; i < matrix.Length; i++)
+            var row = 0;
+            var col = 0;
+            for (var i = 0; i < matrix.Length; i++)
             {
                 matrix[MapIndex(row, col)] = i;
                 col++;
-                if (col >= width) { col = 0; row++; }
+                if (col < width) continue;
+                col = 0;
+                row++;
             }
             if (randomize)
             {
-                RandomizeMatrix(matrix, 0, height);  // shuffle
+                RandomizeMatrix(matrix, 0, height); // shuffle
             }
-
             return matrix;
         }
 
-        private void RandomizeMatrix(int[] array, int lower, int upper)
+        private void RandomizeMatrix(IList<int> matrix, int lower, int upper)
         {
-            for (int i = lower * Width; i < upper * Width; i++)
+            for (var i = lower * Width; i < upper * Width; i++)
             {
-                int result = random.Next(i, Width * upper);
-                int temp = array[result];
-                array[result] = array[i];
-                array[i] = temp;
+                var result = random.Next(i, upper * Width);
+                var temp = matrix[result];
+                matrix[result] = matrix[i];
+                matrix[i] = temp;
             }
         }
 
-        public int MapIndex(int row, int column)
+        private int MapIndex(int row, int column)
         {
             return row * Width + column;
         }
