@@ -1,5 +1,0 @@
-# ninja log v5
-288	365	1641917326067931448	ParallelNumericalIntegration_OpenMP	cfb9e1ea35bc28dc
-1	288	1641917325991932111	CMakeFiles/ParallelNumericalIntegration_OpenMP.dir/main.cpp.o	4dca459b195c7780
-0	423	1641917688768749492	CMakeFiles/ParallelNumericalIntegration_OpenMP.dir/main.cpp.o	87601f4469d3e6ea
-423	489	1641917688832748926	ParallelNumericalIntegration_OpenMP	eb8256004de36647

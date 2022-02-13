@@ -41,7 +41,7 @@ namespace ParallelNumericalIntegration_TPL
             var sum = 0.0;
             var w = (b - a) / n;
             object locker = new();
-            Parallel.For(0, n, 
+            Parallel.For(0, n,
                 () => 0.0,
                 (i, state, partialSum) => partialSum + w * F(a + w * (i + 0.5)),
                 partialSum =>
@@ -54,7 +54,7 @@ namespace ParallelNumericalIntegration_TPL
             );
             return sum;
         }
-        
+
         private static double IntegrateTpl3(int n, double a, double b)
         {
             var sum = 0.0;
@@ -66,7 +66,7 @@ namespace ParallelNumericalIntegration_TPL
                 () => 0.0,
                 (range, state, partialSum) =>
                 {
-                    for( var i = range.Item1; i < range.Item2; i++)
+                    for (var i = range.Item1; i < range.Item2; i++)
                     {
                         partialSum += w * F(a + w * (i + 0.5));
                     }
@@ -86,35 +86,25 @@ namespace ParallelNumericalIntegration_TPL
 
         private static void Main(string[] args)
         {
-            const int n = 1000000000;
 
             var sw = new Stopwatch();
-            sw.Start();
-            var resSeq = IntegrateSeq(n, 0.0, 1.0);
-            sw.Stop();
-            var timeSeq = sw.Elapsed;
-            Console.WriteLine($"Seq\t{resSeq:F10}\t{timeSeq}");
+            for (var n = 1; n <= 1_000_000_001; n *= 10)
+            {
+                Console.WriteLine($"Width: {n}");
+                
+                sw.Start();
+                var resSeq = IntegrateSeq(n, 0.0, 1.0);
+                sw.Stop();
+                var timeSeq = sw.Elapsed;
+                Console.WriteLine($"Seq\t{resSeq:F10}\t{timeSeq}");
 
-            sw.Start();
-            var resTpl = IntegrateTpl(n, 0.0, 1.0);
-            sw.Stop();
-            var timeTpl = sw.Elapsed;
-            Console.WriteLine($"TPL\t{resTpl:F10}\t{timeTpl}");
-            Console.WriteLine($"Speedup: {timeSeq / timeTpl}");
-            
-            sw.Start();
-            var resTpl2 = IntegrateTpl2(n, 0.0, 1.0);
-            sw.Stop();
-            var timeTpl2 = sw.Elapsed;
-            Console.WriteLine($"TPL2\t{resTpl2:F10}\t{timeTpl2}");
-            Console.WriteLine($"Speedup: {timeSeq / timeTpl2}");
-            
-            sw.Start();
-            var resTpl3 = IntegrateTpl3(n, 0.0, 1.0);
-            sw.Stop();
-            var timeTpl3 = sw.Elapsed;
-            Console.WriteLine($"TPL2\t{resTpl3:F10}\t{timeTpl3}");
-            Console.WriteLine($"Speedup: {timeSeq / timeTpl3}");
+                sw.Start();
+                var resTpl = IntegrateTpl3(n, 0.0, 1.0);
+                sw.Stop();
+                var timeTpl = sw.Elapsed;
+                Console.WriteLine($"TPL \t{resTpl:F10}\t{timeTpl}");
+                Console.WriteLine($"Speedup: {timeSeq / timeTpl}");
+            }
         }
     }
 }
