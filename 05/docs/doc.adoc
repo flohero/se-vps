@@ -1,5 +1,6 @@
 = Exercise 05
-:author: Florian Weingartshofer <S1910307103@fhooe.at>
+:author: Florian Weingartshofer 
+:email: <S1910307103@fhooe.at>
 :reproducible:
 :experimental:
 :listing-caption: Listing
@@ -13,6 +14,7 @@
 :img: ./img
 :imagesoutdir: ./out
 
+<<<
 == Stock Visualization
 An asynchronous implementation of the stock visualization.
 Most of the work has been done during the lecture.
@@ -23,6 +25,7 @@ Most of the work has been done during the lecture.
 include::../Quandl.UI/QuandlViewer.cs[lines=32..46]
 ----
 
+<<<
 === With TPL
 
 .TPL
@@ -31,6 +34,7 @@ include::../Quandl.UI/QuandlViewer.cs[lines=32..46]
 include::../Quandl.UI/QuandlViewer.cs[lines=89..115]
 ----
 
+<<<
 === With async/await
 The async/await version is shorter than the TPL approach.
 
@@ -40,10 +44,11 @@ The async/await version is shorter than the TPL approach.
 include::../Quandl.UI/QuandlViewer.cs[lines=117..134]
 ----
 
+<<<
 == Wator World
 === Approach
-The matrix of wator world is divided into mutliple parts, this can be done with an partitioner.
-The number of partitions should be even or it will produce race conditions.
+The matrix of wator world is divided into multiple parts, this can be done with an partitioner.
+To prevent race conditions every even partition is executed first and then the odd partitions.
 
 .Partitioning the matrix
 [source,csharp]
@@ -55,24 +60,26 @@ The matrix randomization algorithm implements two new parameters for upper and l
 
 [source,csharp]
 ----
-include::../Wator/Improved4/Improved4WaterWorld.cs[lines=301..310]
+include::../Wator/Improved4/Improved4WaterWorld.cs[lines=294..303]
 ----
 
 Last each partition is executed.
 
 [source,csharp]
 ----
-include::../Wator/Improved4/Improved4WaterWorld.cs[lines=104..153]
+include::../Wator/Improved4/Improved4WaterWorld.cs[lines=97..146]
 ----
 
 *Advantages*
 
 - Simple by using async/await
-- really fast
+- Really fast, two times faster than the original
 
 *Disadvantages*
 
-- Not the whole matrix gets randomized, but only parts of it
+- Not the whole matrix gets randomized, but only parts of it, since each partition gets randomized
 
 === Comparison
+
+.Improved 4(async) Comparison
 image::img/image-2022-02-13-19-18-05-523.png[]
